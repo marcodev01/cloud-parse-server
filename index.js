@@ -7,7 +7,7 @@ if (!databaseUri) {
   console.log('DATABASE_URI not specified, falling back to localhost.');
 }
 const config = {
-  databaseURI: databaseUri || 'mongodb://localhost:27017/dev',
+  databaseURI: databaseUri || 'mongodb://mongo-db:27017/app',
   appId: process.env.APP_ID,
   masterKey: process.env.MASTER_KEY, 
   serverURL:  'http://localhost:1337/parse',

@@ -5,7 +5,7 @@ Dockerized parser server for running in cloud
  - Install docker desktop
  - (optional) install nodejs and npm
 
-## Setup with mongo-db
+## Local setup with mongo-db
 1. Create [docker network](https://docs.docker.com/get-started/07_multi_container/): `docker network create parse-server`
 2. Pull [offical mongo-db](https://hub.docker.com/_/mongo) docker image: `docker pull mongo`
 3. Create parse server docker image: `docker build -t parse-server .`

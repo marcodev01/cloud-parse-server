@@ -8,7 +8,7 @@ RUN npm install
 
 ENV APP_ID mOYkwNZq5afeNePzifsH
 ENV MASTER_KEY fUPMwubo9BW5lVPyH5fx
-ENV DATABASE_URI mongodb://mongo-db:27017/app
+ENV DATABASE_URI mongodb+srv://admin:pw12345@casproject.4grft5j.mongodb.net/?retryWrites=true&w=majority
 
 # Optional (default : 'parse/cloud/main.js')
 # ENV CLOUD_CODE_MAIN cloudCodePath
