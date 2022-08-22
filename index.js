@@ -29,12 +29,6 @@ if (!process.env.PARSE_MOUNT) {
 if (!process.env.DASHBOARD_MOUNT) {
   console.warn('DASHBOARD_MOUNT not specified, falling back to default: /dashboard.');
 }
-if (!process.env.PARSE_APP_ID) {
-  console.error('ERROR: no PARSE_APP_ID is specified!');
-}
-if (!process.env.PARSE_MASTER_KEY) {
-  console.error('ERROR: no PARSE_MASTER_KEY is specified!');
-}
 
 const databaseConnectionUri = process.env.DATABASE_CONNECTION_URI || 'mongodb://localhost:27017/app';
 const serverUrl = process.env.SERVER_URL || 'http://localhost:1337/parse';
