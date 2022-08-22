@@ -1,15 +1,16 @@
 const express = require('express');
 const ParseServer = require('parse-server').ParseServer;
-const path = require('path');
+const ParseDashboard = require('parse-dashboard');
 
-if(process.env.LOG_LEVEL === "DEBUG") {
+if (process.env.LOG_LEVEL === "DEBUG") {
   console.log('ENVIRONMENT VARIABLES: ', {
     DATABASE_CONNECTION_URI: process.env.DATABASE_CONNECTION_URI,
     SERVER_URL: process.env.SERVER_URL,
     PORT: process.env.PORT,
     PARSE_APP_ID: process.env.PARSE_APP_ID,
     PARSE_MOUNT: process.env.PARSE_MOUNT,
-    CLOUD_CODE_MAIN: process.env.CLOUD_CODE_MAIN,
+    DASHBOARD_MOUNT: process.env.DASHBOARD_MOUNT,
+    APP_NAME: process.env.APP_NAME
   })
 }
 
@@ -25,35 +26,52 @@ if (!process.env.PORT) {
 if (!process.env.PARSE_MOUNT) {
   console.warn('PARSE_MOUNT not specified, falling back to default: /parse.');
 }
-if (!process.env.CLOUD_CODE_MAIN) {
-  console.warn('CLOUD_CODE_MAIN not specified, falling back to default: ' + __dirname + '/cloud/main.js');
+if (!process.env.DASHBOARD_MOUNT) {
+  console.warn('DASHBOARD_MOUNT not specified, falling back to default: /dashboard.');
 }
 if (!process.env.PARSE_APP_ID) {
-  console.error('No PARSE_APP_ID is specified!');
+  console.error('ERROR: no PARSE_APP_ID is specified!');
 }
 if (!process.env.PARSE_MASTER_KEY) {
-  console.error('No PARSE_MASTER_KEY is specified!');
+  console.error('ERROR: no PARSE_MASTER_KEY is specified!');
 }
 
 const databaseConnectionUri = process.env.DATABASE_CONNECTION_URI || 'mongodb://localhost:27017/app';
 const serverUrl = process.env.SERVER_URL || 'http://localhost:1337/parse';
 const port = process.env.PORT || 1337;
+const cloudFunctionsPath = __dirname + '/cloud/main.js'
+const parseMountPath = process.env.PARSE_MOUNT || '/parse';
+const dashboardMountPath = process.env.DASHBOARD_MOUNT || '/dashboard';
+const appName = process.env.APP_NAME || 'my-parse-server';
 
-const config = {
-  databaseURI: databaseConnectionUri ,
+const apiConfig = {
+  databaseURI: databaseConnectionUri,
   appId: process.env.PARSE_APP_ID,
   masterKey: process.env.PARSE_MASTER_KEY,
   serverURL: serverUrl,
-  cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
+  cloud: cloudFunctionsPath,
+};
+
+const dashboardConfig = {
+  appId: process.env.PARSE_APP_ID,
+  masterKey: process.env.PARSE_MASTER_KEY,
+  serverURL: serverUrl,
+  appName: appName
 };
 
 
 const app = express();
 
-// Serve the Parse API on the PARSE_MOUNT URL prefix
-const mountPath = process.env.PARSE_MOUNT || '/parse';
-const api = new ParseServer(config);
-app.use(mountPath, api);
+// serve the Parse API on the PARSE_MOUNT path
+const api = new ParseServer(apiConfig);
+app.use(parseMountPath, api);
+
+
+// make the Parse Dashboard available at DASHBOARD_MOUNT path
+const dashboard = new ParseDashboard({
+  apps: [dashboardConfig]
+})
+app.use(dashboardMountPath, dashboard);
 
 
 // Parse Server plays nicely with the rest of your web routes
@@ -68,5 +86,5 @@ httpServer.listen(port, function () {
 
 module.exports = {
   app,
-  config,
+  apiConfig
 };
