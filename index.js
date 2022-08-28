@@ -48,6 +48,10 @@ const apiConfig = {
   masterKey: process.env.PARSE_SERVER_MASTER_KEY,
   serverURL: serverUrl,
   cloud: cloudFunctionsPath,
+  liveQuery: {
+    // enable live queries via ws protocol for specific class names
+    classNames: ['ratingEntry']
+  }
 
 
   // accountLockout: {
@@ -55,8 +59,8 @@ const apiConfig = {
   //   threshold: 3,
   //   unlockOnPasswordReset: true,
   // },
-  
-  // passwordPolicy: {    
+
+  // passwordPolicy: {
   //   validatorPattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/,
   //   doNotAllowUsername: true,
   //   maxPasswordHistory: 5,
@@ -85,8 +89,8 @@ const dashboard = new ParseDashboard({
 app.use(dashboardMountPath, dashboard);
 
 
-// Parse Server plays nicely with the rest of your web routes
-app.get('/', function (req, res) {
+// remove for production!
+app.get('/test', function (req, res) {
   res.status(200).send('This is a test response...');
 });
 
@@ -94,6 +98,7 @@ const httpServer = require('http').createServer(app);
 httpServer.listen(port, function () {
   console.log('parse-server running on port ' + port + '.');
 });
+ParseServer.createLiveQueryServer(httpServer);
 
 module.exports = {
   app,
