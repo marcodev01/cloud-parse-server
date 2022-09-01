@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+// const cors = require('cors');
 const ParseServer = require('parse-server').ParseServer;
 const ParseDashboard = require('parse-dashboard');
 
@@ -11,7 +12,6 @@ const DEFAULT_PORT = 1337;
 const DEFAULT_PARSE_MOUNT_PATH = '/parse';
 const DEFAULT_DASHBOARD_MOUNT_PATH = '/dashboard';
 const DEFAULT_PARSE_SERVER_APP_NAME = 'my-parse-server';
-
 
 if (process.env.LOG_LEVEL === 'DEBUG') {
   console.log('ENVIRONMENT VARIABLES: ', {
@@ -82,6 +82,7 @@ const dashboardConfig = {
 
 
 const app = express();
+// app.use(cors());
 
 // serve the Parse API on the PARSE_MOUNT path
 const api = new ParseServer(apiConfig);
@@ -105,7 +106,10 @@ const dashboard = new ParseDashboard({
     }
   ],
   "useEncryptedPasswords": true
-})
+},
+{
+  allowInsecureHTTP: true
+});
 app.use(dashboardMountPath, dashboard);
 
 const httpServer = require('http').createServer(app);
