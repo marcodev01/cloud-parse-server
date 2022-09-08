@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-// const cors = require('cors');
+const path = require('path');
 const ParseServer = require('parse-server').ParseServer;
 const ParseDashboard = require('parse-dashboard');
 
@@ -63,8 +63,8 @@ const apiConfig = {
     classNames: ['RatingEntry']
   },
   passwordPolicy: {
-    // password of at least 6 characters which contain at least 1 lower case, 1 upper case and 1 digit
-    validatorPattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,})/,
+    // password of at least 3 characters which contain at least 1 lower case, 1 upper case and 1 digit
+    validatorPattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{3,})/,
     doNotAllowUsername: true,
     maxPasswordHistory: 5,
   }
@@ -82,7 +82,6 @@ const dashboardConfig = {
 
 
 const app = express();
-// app.use(cors());
 
 // serve the Parse API on the PARSE_MOUNT path
 const api = new ParseServer(apiConfig);
@@ -106,11 +105,13 @@ const dashboard = new ParseDashboard({
     }
   ],
   "useEncryptedPasswords": true
-},
-{
-  allowInsecureHTTP: true
 });
 app.use(dashboardMountPath, dashboard);
+
+// provide static ressources by expressJS
+app.get('/static-asset', function (req, res) {
+  res.sendFile(path.join(__dirname, '/public/assets/images/parse-demo-static-asset.png'));
+});
 
 const httpServer = require('http').createServer(app);
 httpServer.listen(port, function () {
