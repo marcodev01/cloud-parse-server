@@ -1,17 +1,8 @@
 'use strict';
 
 const express = require('express');
-const path = require('path');
 const ParseServer = require('parse-server').ParseServer;
 const ParseDashboard = require('parse-dashboard');
-
-// default values if no env variable is defined. Should only be used for local development!
-const DEFAULT_PARSE_SERVER_DATABASE_URI = 'mongodb://localhost:27017/app';
-const DEFAULT_PARSE_SERVER_URL = 'http://localhost:1337/parse';
-const DEFAULT_PORT = 1337;
-const DEFAULT_PARSE_MOUNT_PATH = '/parse';
-const DEFAULT_DASHBOARD_MOUNT_PATH = '/dashboard';
-const DEFAULT_PARSE_SERVER_APP_NAME = 'my-parse-server';
 
 if (process.env.LOG_LEVEL === 'DEBUG') {
   console.log('ENVIRONMENT VARIABLES: ', {
@@ -25,37 +16,13 @@ if (process.env.LOG_LEVEL === 'DEBUG') {
   })
 }
 
-if (!process.env.PARSE_SERVER_DATABASE_URI) {
-  console.info(`PARSE_SERVER_DATABASE_URI not specified, falling back to: ${DEFAULT_PARSE_SERVER_DATABASE_URI}`);
-}
-if (!process.env.PARSE_SERVER_URL) {
-  console.info(`SERVER_URL not specified, falling back to: ${DEFAULT_PARSE_SERVER_URL}`);
-}
-if (!process.env.PORT) {
-  console.info(`PORT not specified, falling back to default port: ${DEFAULT_PORT}`);
-}
-if (!process.env.PARSE_MOUNT_PATH) {
-  console.info(`PARSE_MOUNT not specified, falling back to default: ${DEFAULT_PARSE_MOUNT_PATH}`);
-}
-if (!process.env.DASHBOARD_MOUNT_PATH) {
-  console.info(`DASHBOARD_MOUNT not specified, falling back to default: ${DEFAULT_DASHBOARD_MOUNT_PATH}`);
-}
-
-const databaseConnectionUri = process.env.PARSE_SERVER_DATABASE_URI || DEFAULT_PARSE_SERVER_DATABASE_URI;
-const serverUrl = process.env.PARSE_SERVER_URL || DEFAULT_PARSE_SERVER_URL;
-const port = process.env.PORT || DEFAULT_PORT;
-const cloudFunctionsPath = __dirname + '/cloud/main.js'
-const parseMountPath = process.env.PARSE_MOUNT_PATH || DEFAULT_PARSE_MOUNT_PATH;
-const dashboardMountPath = process.env.DASHBOARD_MOUNT_PATH || DEFAULT_DASHBOARD_MOUNT_PATH;
-const appName = process.env.PARSE_SERVER_APP_NAME || DEFAULT_PARSE_SERVER_APP_NAME;
-
 const apiConfig = {
-  databaseURI: databaseConnectionUri,
+  databaseURI: process.env.PARSE_SERVER_DATABASE_URI,
   appId: process.env.PARSE_SERVER_APPLICATION_ID,
   masterKey: process.env.PARSE_SERVER_MASTER_KEY,
   readOnlyMasterKey: process.env.PARSE_READ_ONLY_MASTER_KEY,
-  serverURL: serverUrl,
-  cloud: cloudFunctionsPath,
+  serverURL: process.env.PARSE_SERVER_URL,
+  cloud: __dirname + '/cloud/main.js',
   // prevent clients can create new classes
   allowClientClassCreation: false,
   liveQuery: {
@@ -75,8 +42,8 @@ const dashboardConfig = {
   appId: process.env.PARSE_SERVER_APPLICATION_ID,
   masterKey: process.env.PARSE_SERVER_MASTER_KEY,
   readOnlyMasterKey: process.env.PARSE_READ_ONLY_MASTER_KEY,
-  serverURL: serverUrl,
-  appName: appName,
+  serverURL: process.env.PARSE_SERVER_URL,
+  appName: process.env.PARSE_SERVER_APP_NAME,
   production: false
 };
 
@@ -85,7 +52,7 @@ const app = express();
 
 // serve the Parse API on the PARSE_MOUNT path
 const api = new ParseServer(apiConfig);
-app.use(parseMountPath, api);
+app.use(process.env.PARSE_MOUNT_PATH || '/parse', api);
 
 
 // make the Parse Dashboard available at DASHBOARD_MOUNT path
@@ -106,16 +73,14 @@ const dashboard = new ParseDashboard({
   ],
   "useEncryptedPasswords": true
 });
-app.use(dashboardMountPath, dashboard);
+app.use(process.env.DASHBOARD_MOUNT_PATH || '/dashboard', dashboard);
 
-// provide static ressources by expressJS
-app.get('/static-asset', function (req, res) {
-  res.sendFile(path.join(__dirname, '/public/assets/images/parse-demo-static-asset.png'));
-});
+// provide static ressources by expressJS - see: https://expressjs.com/en/starter/static-files.html
+app.use(express.static('public'));
 
 const httpServer = require('http').createServer(app);
-httpServer.listen(port, function () {
-  console.log(`parse-server running on port: ${port}.`);
+httpServer.listen(process.env.PORT, function () {
+  console.log(`parse-server running on port: ${process.env.PORT}.`);
 });
 ParseServer.createLiveQueryServer(httpServer);
 

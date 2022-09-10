@@ -1,11 +1,12 @@
 # cloud-parse-server
-Dockerized parse server for running in cloud environment. Parse Server is meant to be mounted on an (Express)[https://expressjs.com/] app.
+Dockerized parse server for running in cloud environment. Parse Server is meant to be mounted on an (ExpressJS)[https://expressjs.com/] app.
 
 ## Preconditions
  - Install `docker` desktop
  - Install `nodejs` and `npm`
 
 ## Docker setup with dockerized mongo-db
+1. To run the docker image in **local environment** set in your `Dockerfile` the `start-local` script (with predifend env vars) as `CMD` instruction parameter  
 1. Create [docker network](https://docs.docker.com/get-started/07_multi_container/): `docker network create parse-server`
 1. Pull [offical mongo-db](https://hub.docker.com/_/mongo) docker image: `docker pull mongo`
 1. Create parse server docker image: `docker build -t parse-server .`
@@ -14,7 +15,7 @@ Dockerized parse server for running in cloud environment. Parse Server is meant 
 
 ## Local setup
 1. Start your mongo-db: either locally, in a docker container or as DBaaS service.
-1. Run `npm run start`
+1. Run `npm run start-local` (with predifend env vars)
 
 # User permissions and security
 - Create new classes (e.g. RatingEntry) by Parse Dasboard. **Note:** Class creation by client is explicitly restricted by `allowClientClassCreation: false` setting. See: https://docs.parseplatform.org/parse-server/guide/#class-level-permissions
