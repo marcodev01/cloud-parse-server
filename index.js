@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const cors = require('cors');
 const ParseServer = require('parse-server').ParseServer;
 const ParseDashboard = require('parse-dashboard');
 
@@ -49,6 +50,7 @@ const dashboardConfig = {
 
 
 const app = express();
+app.use(cors());
 
 // serve the Parse API on the PARSE_MOUNT path
 const api = new ParseServer(apiConfig);
