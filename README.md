@@ -1,5 +1,5 @@
 # cloud-parse-server
-Dockerized parse server for running in cloud environment. Parse Server is meant to be mounted on an [https://expressjs.com/](ExpressJS) app.
+Dockerized parse server for running in cloud environment. Parse Server is meant to be mounted on an [ExpressJS](https://expressjs.com/) app.
 
 ## Preconditions
  - Install `docker` desktop
